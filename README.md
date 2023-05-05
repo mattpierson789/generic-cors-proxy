@@ -1,0 +1,3 @@
+# a simple CORS proxy server
+
+- Recevievs a key or 'url' in the query params .....
