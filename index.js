@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
         })               
             .then(resBody => res.send(resBody.data));
     } else {
-        res.send("Hello World!");
+        // res.send("Hello World!");
     }
 });
 
