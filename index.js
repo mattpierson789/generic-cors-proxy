@@ -26,7 +26,9 @@ const spotifyApi = new SpotifyWebApi({
     // Open AI Get Request Handler 
 
     app.get("/", (req, res) => {
+      console.log("heyyyyyyyy matt")
         // api url format domain + path + ? + api_key=key + 
+        console.log(req.query.prompt)
         if (req.query.prompt) {
             // let api_key = `?api_key=${process.env.API_KEY}`
             // let api_path = req.query.api_path
