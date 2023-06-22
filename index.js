@@ -55,8 +55,7 @@ const spotifyApi = new SpotifyWebApi({
                 }
 
 
-            })               
-                .then(resBody => res.send(resBody.data));
+            }).then(resBody => res.send(resBody.data)).catch(err => res.send(err));
         } else {
             res.send("Hello World!");
         }
