@@ -70,6 +70,20 @@ app.all('*', (req, res) => {
     res.status(404).send('Not Found');
 });
 
+app.get("/check-key", async (req, res) => {
+    try {
+        const response = await axios.get("https://api.openai.com/v1/models", {
+            headers: {
+                Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+            }
+        });
+        res.send("✅ API key is valid and working!");
+    } catch (error) {
+        console.error("API key check error:", error.response?.data || error.message);
+        res.status(500).send("❌ " + (error.response?.data?.error?.message || "Unknown error"));
+    }
+});
+
 // Start server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
