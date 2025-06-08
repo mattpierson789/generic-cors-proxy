@@ -16,7 +16,7 @@ const spotifyApi = new SpotifyWebApi({
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 });
 
-// OpenAI endpoint
+// ✅ OpenAI endpoint with explicit CORS
 app.get("/", (req, res) => {
     const prompt = req.query.prompt;
     console.log("Prompt received:", prompt);
@@ -37,14 +37,21 @@ app.get("/", (req, res) => {
             "Content-Type": "application/json"
         }
     })
-    .then(response => res.send(response.data))
+    .then(response => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.json(response.data);
+    })
     .catch(err => {
         console.error("OpenAI error:", err.response?.data || err.message);
-        res.status(500).json({ error: err.message, details: err.response?.data || err });
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.status(500).json({
+            error: err.message,
+            details: err.response?.data || err
+        });
     });
 });
 
-// Spotify recommendations endpoint
+// ✅ Spotify recommendations
 app.post('/recommendations', async (req, res) => {
     const { trackIds } = req.body;
 
@@ -57,19 +64,16 @@ app.post('/recommendations', async (req, res) => {
             limit: 20,
         });
 
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.json(recommendations.body.tracks);
     } catch (error) {
         console.error('Spotify error:', error);
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.status(500).json({ message: 'Error fetching recommendations' });
     }
 });
 
-// Catch-all
-app.all('*', (req, res) => {
-    console.log(`Unhandled request: ${req.method} ${req.url}`);
-    res.status(404).send('Not Found');
-});
-
+// ✅ Test API key
 app.get("/check-key", async (req, res) => {
     try {
         const response = await axios.get("https://api.openai.com/v1/models", {
@@ -77,11 +81,19 @@ app.get("/check-key", async (req, res) => {
                 Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
             }
         });
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.send("✅ API key is valid and working!");
     } catch (error) {
         console.error("API key check error:", error.response?.data || error.message);
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.status(500).send("❌ " + (error.response?.data?.error?.message || "Unknown error"));
     }
+});
+
+// Catch-all
+app.all('*', (req, res) => {
+    console.log(`Unhandled request: ${req.method} ${req.url}`);
+    res.status(404).send('Not Found');
 });
 
 // Start server
