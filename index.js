@@ -99,6 +99,8 @@ const spotifyApi = new SpotifyWebApi({
 
 // Generic Server Code choosing the port 
 
-app.listen(5001, () => {
-    console.log("Listening on PORT: 5001")
-})
+const PORT = process.env.PORT || 5001;
+
+app.listen(PORT, () => {
+    console.log(`Listening on PORT: ${PORT}`);
+});
