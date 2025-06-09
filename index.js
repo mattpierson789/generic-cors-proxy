@@ -69,26 +69,31 @@ app.get("/spotify-token", async (req, res) => {
   }
 });
 
-// ✅ Spotify recommendations (optional)
+// Spotify Reccomendations
 app.post('/recommendations', async (req, res) => {
-  const { trackIds } = req.body;
+    const { trackIds } = req.body;
 
-  try {
-    const data = await spotifyApi.clientCredentialsGrant();
-    spotifyApi.setAccessToken(data.body['access_token']);
+    console.log("trackIds received:", trackIds); // ✅ Log input
 
-    const recommendations = await spotifyApi.getRecommendations({
-      seed_tracks: trackIds,
-      limit: 20,
-    });
+    if (!Array.isArray(trackIds) || trackIds.length === 0) {
+        return res.status(400).json({ message: 'No track IDs provided' });
+    }
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.json(recommendations.body.tracks);
-  } catch (error) {
-    console.error('Spotify error:', error);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.status(500).json({ message: 'Error fetching recommendations' });
-  }
+    try {
+        const data = await spotifyApi.clientCredentialsGrant();
+        spotifyApi.setAccessToken(data.body['access_token']);
+
+        const recommendations = await spotifyApi.getRecommendations({
+            seed_tracks: trackIds.slice(0, 5), // Spotify allows max 5
+            limit: 20,
+        });
+
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.json(recommendations.body.tracks);
+    } catch (error) {
+        console.error('Spotify error:', error);
+        res.status(500).json({ message: 'Error fetching recommendations', details: error.body });
+    }
 });
 
 // ✅ OpenAI API key check
